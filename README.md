@@ -2,8 +2,9 @@
 
 ## これは何？
 AUTOMATIC1111/stable-diffusion-webuiの、txt2imgを実行したあとに、そのままimg2imgに処理を渡してSDアップスケールを自動的に行うツールです。
-実際にはwebuiのapiを叩いているので、txt2imgのあとに行う処理はSDアップスケールに限らず、webuiでできることは何でもできますが、いったんツールとしての説明は、txt2imgのあとにimg2imgのSDアップスケールを行うツールとしての説明だけにとどめておきます。
+実際にはwebuiのapiを叩いているので、txt2imgのあとに行う処理はSDアップスケールに限らず、webuiでできることは何でもできます。ですが、説明が散漫になることを防ぎたいのでいったんツールとしての説明は、txt2imgのあとにimg2imgのSDアップスケールを行うツールとしての説明だけにとどめておきます。
 
+日々増え続ける生成画像の管理を、外部のファイル管理ツールに頼らざるをえなくなった結果、大量のimg2imgアップスケールへの導線がなかなか自動化できず、いっそのこと生成時に全部アップスケールしてしまえばいいと思って作りました。先にも書きましたが実際にはAPIを叩いているだけなので、設定ファイルの工夫の仕方によってはほかにもAPIでできることは何でもできると思います。特にScriptへのパラメーターの渡し方については[Add a way for API txt2img and img2img requests to pass args to always on scripts by Vespinian · Pull Request \#8187 · AUTOMATIC1111/stable\-diffusion\-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui/pull/8187#issuecomment-1487725805)がとても参考になると思います。
 ## 動作必要環境
 
 + [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui)が適切にインストールされていて起動できる
