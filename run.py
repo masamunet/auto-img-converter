@@ -1,6 +1,5 @@
 import requests
 import json
-import util
 import os
 import hashlib
 import time
@@ -10,9 +9,6 @@ import argparse
 setting_params = {}
 
 uri = "http://127.0.0.1:7860"
-output_dir = "output"
-txt2img_dir = os.path.join(output_dir, 'txt2img')
-img2img_dir = os.path.join(output_dir, 'img2img')
 
 
 def get_hash(data):
@@ -45,7 +41,7 @@ def access_api(url, payload):
 
 
 # access_apiのラッパー。webui api にアクセスし、結果を返す
-def get_txt2img(url, payload):
+def get_any2img(url, payload):
     response = access_api(url, payload)
     # レスポンスのステータスコードを確認する
     if response.status_code == 200:
@@ -66,16 +62,10 @@ def txt2img(params, txt2img_params):
     payload = params.copy()
     payload["alwayson_scripts"] = txt2img_params["alwayson_scripts"]
     url = uri + "/sdapi/v1/txt2img"
-    image_base64, res_info = get_txt2img(url, payload)
-    filepath = util.save_base64_image_to_file(
-        image_base64, txt2img_dir, "txt_{}.png".format(
-            get_hash(get_current_milliseconds()))
-    )
+    image_base64, res_info = get_any2img(url, payload)
     infotexts = res_info["infotexts"]
     r_seed = res_info["seed"]
-    print(infotexts[0])
-    print(filepath)
-    return payload, filepath, infotexts, image_base64, r_seed
+    return payload, infotexts, image_base64, r_seed
 
 
 def img2img(payload, img2img_params, image64, seed, prompt, negative_prompt):
@@ -91,40 +81,19 @@ def img2img(payload, img2img_params, image64, seed, prompt, negative_prompt):
     payload["script_name"] = img2img_params["script_name"]
     payload["script_args"] = img2img_params["script_args"]
     url = uri + "/sdapi/v1/img2img"
-    image_base64, res_info = get_txt2img(url, payload)
-    filepath = util.save_base64_image_to_file(
-        image_base64, img2img_dir, "img_{}.png".format(
-            get_hash(get_current_milliseconds()))
-    )
+    image_base64, res_info = get_any2img(url, payload)
     infotexts = res_info["infotexts"]
     r_seed = res_info["seed"]
-    return payload, filepath, infotexts, r_seed
+    return payload, infotexts, r_seed
 
-
-def save2eagle(filepath, infotexts):
-    """
-    Eagleに保存する関数
-    EagleのAPIを使用して、画像をEagleに保存する
-    """
-    host = "http://localhost:41595"
-    url = "{}/api/item/addFromPath".format(host)
-    file_name = os.path.basename(filepath)
-    fullpath = get_full_path(filepath)
-    payload = {
-        "path": fullpath,
-        "name": file_name,
-        "annotation": infotexts
-    }
-    response = access_api(url, payload)
-    return response
 
 
 def start():
-    payload, filepath, infotexts, image_base64, seed = txt2img(
+    payload, infotexts, image_base64, seed = txt2img(
         setting_params["params"], setting_params["txt2img_params"])
     info_lines = infotexts[0].split("\n")
     if setting_params["is_upscale"]:
-        payload, filepath, infotexts, seed = img2img(payload, setting_params["img2img_params"], image_base64, seed,
+        payload, infotexts, seed = img2img(payload, setting_params["img2img_params"], image_base64, seed,
                                                      info_lines[0], info_lines[1])
         info_lines = infotexts[0].split("\n")
     return
