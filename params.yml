@@ -1,5 +1,5 @@
-count: 1
-is_upscale: false
+count: 1  # 処理を繰り返す回数
+is_upscale: false # 画像を拡大するか。アップスケールする場合はtrue
 prompt: "dog riding a skateboard"
 negative_prompt: "cat"
 params:
