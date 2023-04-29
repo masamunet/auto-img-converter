@@ -87,14 +87,13 @@ def img2img(payload, img2img_params, image64, seed, prompt, negative_prompt):
     return payload, infotexts, r_seed
 
 
-
 def start():
     payload, infotexts, image_base64, seed = txt2img(
         setting_params["params"], setting_params["txt2img_params"])
     info_lines = infotexts[0].split("\n")
     if setting_params["is_upscale"]:
         payload, infotexts, seed = img2img(payload, setting_params["img2img_params"], image_base64, seed,
-                                                     info_lines[0], info_lines[1])
+                                           info_lines[0], info_lines[1])
         info_lines = infotexts[0].split("\n")
     return
 
@@ -102,7 +101,7 @@ def start():
 def run():
     # countの回数+1だけstart()を実行する
     for i in range(setting_params["count"]):
-        print("\n++++++++\ncount: {}".format(i))
+        print("count: {}".format(i))
         start()
     print("Done!")
     return
@@ -113,8 +112,8 @@ if __name__ == "__main__":
     # 引数の設定
     parser = argparse.ArgumentParser(
         description="Script to load parameters from YAML file.")
-    parser.add_argument("--yaml_file", type=str, default="params.yml",
-                        help="YAML file containing parameters")
+    parser.add_argument("-f", "--yaml_file", type=str,
+                        default="params.yml", help="YAML file containing parameters")
     args = parser.parse_args()
     with open(args.yaml_file, 'r') as stream:
         try:
