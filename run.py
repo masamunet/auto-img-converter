@@ -10,6 +10,11 @@ setting_params = {}
 
 uri = "http://localhost:7860"
 
+def load_yaml(yaml_file):
+    """YAMLファイルを読み込み、辞書型に変換する関数"""
+    with open(yaml_file, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    return data 
 
 def get_hash(data):
     """与えられたデータのSHA256ハッシュを計算し、16進数文字列として返す関数"""
@@ -105,12 +110,19 @@ def start():
         info_lines = infotexts[0].split("\n")
     return
 
+def loopback(setting_params):
+    for i in range(len(setting_params["loopbacks"])):
+        loopback_params = setting_params["loopbacks"][i]
+        print("loopback: {}".format(i))
+        print("endpoint: {}".format(loopback_params["api_endpoint"]))
+        print("params: {}".format(loopback_params["params"]))
 
-def run():
+def run(args):
     # countの回数+1だけstart()を実行する
-    for i in range(setting_params["count"]):
+    for i in range(args.count):
         print("count: {}".format(i))
-        start()
+        setting_params = load_yaml(args.yaml_file)
+        loopback(setting_params)
     print("Done!")
     return
 
@@ -122,12 +134,15 @@ if __name__ == "__main__":
         description="Script to load parameters from YAML file.")
     parser.add_argument("-f", "--yaml_file", type=str,
                         default="params.yml", help="YAML file containing parameters")
+    parser.add_argument("-c", "--count", type=int,
+                        default=1, help="loopback count")
     args = parser.parse_args()
-    with open(args.yaml_file, 'r') as stream:
-        try:
-            setting_params = yaml.safe_load(stream)
-            setting_params["params"]["prompt"] = setting_params["prompt"]
-            setting_params["params"]["negative_prompt"] = setting_params["negative_prompt"]
-        except yaml.YAMLError as exc:
-            print(exc)
-    run()
+    run(args)
+    # with open(args.yaml_file, 'r') as stream:
+    #     try:
+    #         setting_params = yaml.safe_load(stream)
+    #         setting_params["params"]["prompt"] = setting_params["prompt"]
+    #         setting_params["params"]["negative_prompt"] = setting_params["negative_prompt"]
+    #     except yaml.YAMLError as exc:
+    #         print(exc)
+    # run()
