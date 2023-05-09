@@ -162,3 +162,5 @@ cython_debug/
 output
 params_*
 p.yml
+p_*.yml
+.vscode/settings.json

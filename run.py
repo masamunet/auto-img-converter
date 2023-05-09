@@ -8,7 +8,7 @@ import argparse
 
 setting_params = {}
 
-uri = "http://127.0.0.1:7860"
+uri = "http://localhost:7860"
 
 
 def get_hash(data):
@@ -78,8 +78,16 @@ def img2img(payload, img2img_params, image64, seed, prompt, negative_prompt):
     payload["seed"] = seed
     payload["denoising_strength"] = img2img_params["denoising_strength"]
     payload["script_name"] = ""
-    payload["script_name"] = img2img_params["script_name"]
-    payload["script_args"] = img2img_params["script_args"]
+    payload["alwayson_scripts"] = None
+    if "width" in img2img_params:
+      payload["width"] = img2img_params["width"]
+    if "height" in img2img_params:
+      payload["height"] = img2img_params["height"]
+    if "script_name" in img2img_params:
+      payload["script_name"] = img2img_params["script_name"]
+      payload["script_args"] = img2img_params["script_args"]
+    if "alwayson_scripts" in img2img_params:
+      payload["alwayson_scripts"] = img2img_params["alwayson_scripts"]
     url = uri + "/sdapi/v1/img2img"
     image_base64, res_info = get_any2img(url, payload)
     infotexts = res_info["infotexts"]
