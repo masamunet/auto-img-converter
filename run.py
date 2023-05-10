@@ -9,11 +9,13 @@ import argparse
 
 uri = "http://localhost:7860"
 
+
 def load_yaml(yaml_file):
     """YAMLファイルを読み込み、辞書型に変換する関数"""
     with open(yaml_file, encoding="utf-8") as f:
         data = yaml.safe_load(f)
-    return data 
+    return data
+
 
 def get_hash(data):
     """与えられたデータのSHA256ハッシュを計算し、16進数文字列として返す関数"""
@@ -60,11 +62,9 @@ def get_any2img(url, payload):
         print("Error: {}".format(response.text))
         return None, None
 
-def any2img(uri, endpoint, params, result_params=None):
-    if result_params is None:
-      payload = params.copy()
-    else:
-      payload = {**params, **result_params}
+
+def any2img(uri, endpoint, params):
+    payload = params.copy()
     url = uri + endpoint
     image_base64, res_info = get_any2img(url, payload)
     infotexts = res_info["infotexts"]
@@ -120,26 +120,30 @@ def any2img(uri, endpoint, params, result_params=None):
 #     return
 
 def loopback(setting_params):
-    result_params = {}
+    infotexts = None
+    image_base64 = None
+    r_seed = None
+    prompt = setting_params["f_prompt"]
+    negative_prompt = setting_params["f_negative_prompt"]
     for i in range(len(setting_params["loopbacks"])):
         loopback_params = setting_params["loopbacks"][i]
         endpoint = loopback_params["api_endpoint"]
         params = loopback_params["params"]
+        params["prompt"] = prompt
+        params["negative_prompt"] = negative_prompt
         print("loopback: {}".format(i))
         print("endpoint: {}".format(endpoint))
         params["prompt"] = setting_params["f_prompt"]
         print("params: {}".format(params))
         params["negative_prompt"] = setting_params["f_negative_prompt"]
-        infotexts, image_base64, r_seed = any2img(uri, endpoint, params, result_params=result_params)
         if "init_images" in loopback_params["params"]:
-            result_params = {"init_images": [image_base64]}
-            result_params["seed"] = r_seed
+            params["init_images"] = [image_base64]
+            params["seed"] = r_seed
+        infotexts, image_base64, r_seed = any2img(
+            uri, endpoint, params)
         info_lines = infotexts[0].split("\n")
-        plus_params = {
-            "prompt": info_lines[0],
-            "negative_prompt": info_lines[1].replace("Negative prompt: ", "")
-        }
-        result_params = {**result_params, **plus_params}
+        prompt = info_lines[0]
+        negative_prompt = info_lines[1].replace("Negative prompt: ", "")
 
 
 def run(args):

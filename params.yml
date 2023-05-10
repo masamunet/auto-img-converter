@@ -38,15 +38,15 @@ loopbacks:
       <<: *params
       init_images: []
       denoising_strength: 0.35
-      script_name: "Ultimate SD upscale"
-      script_args:
-            - 0  # _
-            - 512  # tile_width
-            - 0  # tile_height
-            - 24  # mask_blur
-            - 64  # padding
-            - 64  # seams_fix_width
-            - 0.35  # seams_fix_denoise
-            - 64  # seams_fix_padding
-            - 3  # upscaler_index
-            - True  # save_upscaled_image
+      # script_name: "Ultimate SD upscale"
+      # script_args:
+      #       - 0  # _
+      #       - 512  # tile_width
+      #       - 0  # tile_height
+      #       - 24  # mask_blur
+      #       - 64  # padding
+      #       - 64  # seams_fix_width
+      #       - 0.35  # seams_fix_denoise
+      #       - 64  # seams_fix_padding
+      #       - 3  # upscaler_index
+      #       - True  # save_upscaled_image
