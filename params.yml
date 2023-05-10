@@ -74,7 +74,7 @@ loopbacks:
     params:
       <<: *params
       init_images: []
-      denoising_strength: 1
+      denoising_strength: 0.75
       alwayson_scripts:
         "ControlNet":
           args:
