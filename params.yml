@@ -13,7 +13,7 @@ loopbacks:
     params:
       <<: *params
       alwayson_scripts:
-        "Dynamic Prompts v2.11.1":  &dp
+        "Dynamic Prompts v2.11.2":  &dp
           args:
             - True  # is_enabled
             - False  # is_combinatorial
@@ -36,6 +36,7 @@ loopbacks:
   - api_endpoint: "/sdapi/v1/img2img"
     params:
       <<: *params
+      init_images: []
       denoising_strength: 0.35
       script_name: "Ultimate SD upscale"
       script_args:

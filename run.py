@@ -6,7 +6,6 @@ import time
 import yaml
 import argparse
 
-setting_params = {}
 
 uri = "http://localhost:7860"
 
@@ -61,61 +60,87 @@ def get_any2img(url, payload):
         print("Error: {}".format(response.text))
         return None, None
 
-
-def txt2img(params, txt2img_params):
-    """txt2imgを実行し、結果を返す関数"""
-    payload = params.copy()
-    payload["alwayson_scripts"] = txt2img_params["alwayson_scripts"]
-    url = uri + "/sdapi/v1/txt2img"
+def any2img(uri, endpoint, params, result_params=None):
+    if result_params is None:
+      payload = params.copy()
+    else:
+      payload = {**params, **result_params}
+    url = uri + endpoint
     image_base64, res_info = get_any2img(url, payload)
     infotexts = res_info["infotexts"]
     r_seed = res_info["seed"]
-    return payload, infotexts, image_base64, r_seed
+    return infotexts, image_base64, r_seed
+
+# def txt2img(params, txt2img_params):
+#     """txt2imgを実行し、結果を返す関数"""
+#     payload = params.copy()
+#     payload["alwayson_scripts"] = txt2img_params["alwayson_scripts"]
+#     url = uri + "/sdapi/v1/txt2img"
+#     image_base64, res_info = get_any2img(url, payload)
+#     infotexts = res_info["infotexts"]
+#     r_seed = res_info["seed"]
+#     return payload, infotexts, image_base64, r_seed
 
 
-def img2img(payload, img2img_params, image64, seed, prompt, negative_prompt):
-    """
-    """
-    payload["init_images"] = [image64]
-    payload["prompt"] = prompt
-    payload["negative_prompt"] = negative_prompt.replace(
-        "Negative prompt: ", "")
-    payload["seed"] = seed
-    payload["denoising_strength"] = img2img_params["denoising_strength"]
-    payload["script_name"] = ""
-    payload["alwayson_scripts"] = None
-    if "width" in img2img_params:
-      payload["width"] = img2img_params["width"]
-    if "height" in img2img_params:
-      payload["height"] = img2img_params["height"]
-    if "script_name" in img2img_params:
-      payload["script_name"] = img2img_params["script_name"]
-      payload["script_args"] = img2img_params["script_args"]
-    if "alwayson_scripts" in img2img_params:
-      payload["alwayson_scripts"] = img2img_params["alwayson_scripts"]
-    url = uri + "/sdapi/v1/img2img"
-    image_base64, res_info = get_any2img(url, payload)
-    infotexts = res_info["infotexts"]
-    r_seed = res_info["seed"]
-    return payload, infotexts, r_seed
+# def img2img(payload, img2img_params, image64, seed, prompt, negative_prompt):
+#     """
+#     """
+#     payload["init_images"] = [image64]
+#     payload["prompt"] = prompt
+#     payload["negative_prompt"] = negative_prompt.replace(
+#         "Negative prompt: ", "")
+#     payload["seed"] = seed
+#     payload["denoising_strength"] = img2img_params["denoising_strength"]
+#     payload["script_name"] = ""
+#     payload["alwayson_scripts"] = None
+#     if "width" in img2img_params:
+#       payload["width"] = img2img_params["width"]
+#     if "height" in img2img_params:
+#       payload["height"] = img2img_params["height"]
+#     if "script_name" in img2img_params:
+#       payload["script_name"] = img2img_params["script_name"]
+#       payload["script_args"] = img2img_params["script_args"]
+#     if "alwayson_scripts" in img2img_params:
+#       payload["alwayson_scripts"] = img2img_params["alwayson_scripts"]
+#     url = uri + "/sdapi/v1/img2img"
+#     image_base64, res_info = get_any2img(url, payload)
+#     infotexts = res_info["infotexts"]
+#     r_seed = res_info["seed"]
+#     return payload, infotexts, r_seed
 
 
-def start():
-    payload, infotexts, image_base64, seed = txt2img(
-        setting_params["params"], setting_params["txt2img_params"])
-    info_lines = infotexts[0].split("\n")
-    if setting_params["is_upscale"]:
-        payload, infotexts, seed = img2img(payload, setting_params["img2img_params"], image_base64, seed,
-                                           info_lines[0], info_lines[1])
-        info_lines = infotexts[0].split("\n")
-    return
+# def start():
+#     payload, infotexts, image_base64, seed = txt2img(
+#         setting_params["params"], setting_params["txt2img_params"])
+#     info_lines = infotexts[0].split("\n")
+#     if setting_params["is_upscale"]:
+#         payload, infotexts, seed = img2img(payload, setting_params["img2img_params"], image_base64, seed,
+#                                            info_lines[0], info_lines[1])
+#         info_lines = infotexts[0].split("\n")
+#     return
 
 def loopback(setting_params):
+    result_params = {}
     for i in range(len(setting_params["loopbacks"])):
         loopback_params = setting_params["loopbacks"][i]
+        endpoint = loopback_params["api_endpoint"]
+        params = loopback_params["params"]
         print("loopback: {}".format(i))
-        print("endpoint: {}".format(loopback_params["api_endpoint"]))
-        print("params: {}".format(loopback_params["params"]))
+        print("endpoint: {}".format(endpoint))
+        params["prompt"] = setting_params["f_prompt"]
+        print("params: {}".format(params))
+        params["negative_prompt"] = setting_params["f_negative_prompt"]
+        infotexts, image_base64, r_seed = any2img(uri, endpoint, params, result_params=result_params)
+        if "init_images" in loopback_params["params"]:
+            result_params = {"init_images": [image_base64]}
+            result_params["seed"] = r_seed
+        info_lines = infotexts[0].split("\n")
+        plus_params = {
+            "prompt": info_lines[0],
+            "negative_prompt": info_lines[1].replace("Negative prompt: ", "")
+        }
+        result_params = {**result_params, **plus_params}
+
 
 def run(args):
     # countの回数+1だけstart()を実行する
