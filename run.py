@@ -5,6 +5,7 @@ import hashlib
 import time
 import yaml
 import argparse
+import notify
 
 
 uri = "http://localhost:7860"
@@ -71,53 +72,6 @@ def any2img(uri, endpoint, params):
     r_seed = res_info["seed"]
     return infotexts, image_base64, r_seed
 
-# def txt2img(params, txt2img_params):
-#     """txt2imgを実行し、結果を返す関数"""
-#     payload = params.copy()
-#     payload["alwayson_scripts"] = txt2img_params["alwayson_scripts"]
-#     url = uri + "/sdapi/v1/txt2img"
-#     image_base64, res_info = get_any2img(url, payload)
-#     infotexts = res_info["infotexts"]
-#     r_seed = res_info["seed"]
-#     return payload, infotexts, image_base64, r_seed
-
-
-# def img2img(payload, img2img_params, image64, seed, prompt, negative_prompt):
-#     """
-#     """
-#     payload["init_images"] = [image64]
-#     payload["prompt"] = prompt
-#     payload["negative_prompt"] = negative_prompt.replace(
-#         "Negative prompt: ", "")
-#     payload["seed"] = seed
-#     payload["denoising_strength"] = img2img_params["denoising_strength"]
-#     payload["script_name"] = ""
-#     payload["alwayson_scripts"] = None
-#     if "width" in img2img_params:
-#       payload["width"] = img2img_params["width"]
-#     if "height" in img2img_params:
-#       payload["height"] = img2img_params["height"]
-#     if "script_name" in img2img_params:
-#       payload["script_name"] = img2img_params["script_name"]
-#       payload["script_args"] = img2img_params["script_args"]
-#     if "alwayson_scripts" in img2img_params:
-#       payload["alwayson_scripts"] = img2img_params["alwayson_scripts"]
-#     url = uri + "/sdapi/v1/img2img"
-#     image_base64, res_info = get_any2img(url, payload)
-#     infotexts = res_info["infotexts"]
-#     r_seed = res_info["seed"]
-#     return payload, infotexts, r_seed
-
-
-# def start():
-#     payload, infotexts, image_base64, seed = txt2img(
-#         setting_params["params"], setting_params["txt2img_params"])
-#     info_lines = infotexts[0].split("\n")
-#     if setting_params["is_upscale"]:
-#         payload, infotexts, seed = img2img(payload, setting_params["img2img_params"], image_base64, seed,
-#                                            info_lines[0], info_lines[1])
-#         info_lines = infotexts[0].split("\n")
-#     return
 
 def loopback(setting_params):
     infotexts = None
@@ -166,6 +120,7 @@ def run(args):
         setting_params = load_yaml(args.yaml_file)
         loopback(setting_params)
     print("Done!")
+    notify.notify("処理が完了しました!")
     return
 
 
@@ -180,11 +135,3 @@ if __name__ == "__main__":
                         default=1, help="loopback count")
     args = parser.parse_args()
     run(args)
-    # with open(args.yaml_file, 'r') as stream:
-    #     try:
-    #         setting_params = yaml.safe_load(stream)
-    #         setting_params["params"]["prompt"] = setting_params["prompt"]
-    #         setting_params["params"]["negative_prompt"] = setting_params["negative_prompt"]
-    #     except yaml.YAMLError as exc:
-    #         print(exc)
-    # run()
