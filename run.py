@@ -81,6 +81,9 @@ def loopback(setting_params):
     negative_prompt = setting_params["f_negative_prompt"]
     for i in range(len(setting_params["loopbacks"])):
         loopback_params = setting_params["loopbacks"][i]
+        if "is_disabled" in loopback_params:
+          if loopback_params["is_disabled"]:
+              continue
         endpoint = loopback_params["api_endpoint"]
         params = loopback_params["params"]
         params["prompt"] = prompt

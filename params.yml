@@ -71,6 +71,7 @@ loopbacks:
             - true  # fast_encoder
             - false  # color_fix
   - api_endpoint: "/sdapi/v1/img2img"
+    is_disabled: true # このループバックは無効にする
     params:
       <<: *params
       init_images: []
