@@ -1,10 +1,17 @@
 f_prompt: "dog riding a skateboard" # 最初に開始するプロンプト。ダイナミックプロンプトが有効なので、一回目はこのプロンプトを使用する。２回目以降からはパースされたプロンプトを使用する
 f_negative_prompt: "cat"  # 最初に開始するネガティブプロンプト
+size:
+  - width: &w_1 512
+    height: &h_1 512
+  - width: &w_2 640
+    height: &h_2 640
+    scale: &scale_1 1.25
+  - scale: &scale_2 2
 default_params: &params
-  sampler_name: DPM++ 2M Karras
+  sampler_name: DPM++ 2M a Karras
   steps: 8
-  width: 512
-  height: 512
+  width: *w_1
+  height: *h_1
   cfg_scale: 7
   seed: -1
   save_images: true
@@ -33,6 +40,36 @@ loopbacks:
             - 0  # max_generations
             - ""  # magic_model
             - null  # magic_blocklist_regex
+  - api_endpoint: "/sdapi/v1/txt2img"
+    params:
+      <<: *params
+      seed: -1
+      width: *w_2
+      height: *h_2
+      enable_hr: false
+      hr_scale: *scale_1
+      hr_upscaler: "Latent" # "R-ESRGAN 4x+"
+      denoising_strength: 0.7
+      alwayson_scripts:
+        "Dynamic Prompts v2.11.2":  *dp
+        "ControlNet":
+          args:
+            - input_image: null
+              module: "tile_resample"
+              model: "control_v11f1e_sd15_tile [a371b31b]"
+              processor_res: 64
+              threshold_a: 1
+              threshold_b: 64
+        "Tiled VAE":
+          args:
+            - 0  # p
+            - true  # enabled
+            - 512  # encoder_tile_size
+            - 64  # decoder_tile_size
+            - true  # vae_to_gpu
+            - true  # fast_decoder
+            - true  # fast_encoder
+            - false  # color_fix
   - api_endpoint: "/sdapi/v1/img2img"
     params:
       <<: *params
@@ -57,4 +94,4 @@ loopbacks:
         - 2  # target_size_type "From img2img2 settings", "Custom size", "Scale from image size"
         - 0  # custom_width
         - 0  # custom_height
-        - 2  # custom_scale
+        - 2  *scale_2 # custom_scale

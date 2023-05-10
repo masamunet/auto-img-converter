@@ -136,9 +136,22 @@ def loopback(setting_params):
         params["prompt"] = setting_params["f_prompt"]
         print("params: {}".format(params))
         params["negative_prompt"] = setting_params["f_negative_prompt"]
+        if r_seed is not None:
+            if params["seed"] < 0:
+                params["seed"] = r_seed
         if "init_images" in loopback_params["params"]:
             params["init_images"] = [image_base64]
-            params["seed"] = r_seed
+        # "alwayson_scripts"がある場合
+        if "alwayson_scripts" in loopback_params["params"]:
+            # "ControlNet"がある場合
+            if "ControlNet" in loopback_params["params"]["alwayson_scripts"]:
+                # "input_image"がある場合
+                if "input_image" in loopback_params["params"]["alwayson_scripts"]["ControlNet"]["args"][0]:
+                    # "input_image"を置き換える
+                    loopback_params["params"]["alwayson_scripts"]["ControlNet"]["args"][0]["input_image"] = image_base64
+                    # 新しい辞書をparams["alwayson_scripts"]["ControlNet"]に代入する
+                    params["alwayson_scripts"]["ControlNet"] = loopback_params["params"]["alwayson_scripts"]["ControlNet"]
+
         infotexts, image_base64, r_seed = any2img(
             uri, endpoint, params)
         info_lines = infotexts[0].split("\n")
