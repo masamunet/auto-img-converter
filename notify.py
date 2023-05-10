@@ -9,4 +9,7 @@ def notify(message, title=None, subtitle=None):
     elif platform.system() == 'Windows':  # Windowsの場合
         from win10toast import ToastNotifier
         toaster = ToastNotifier()
-        toaster.show_toast(title, message)
+        try:
+            toaster.show_toast(title, message)
+        except:
+            pass
