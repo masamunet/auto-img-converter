@@ -6,7 +6,7 @@ size:
   - width: &w_2 640
     height: &h_2 640
     scale: &scale_1 1.25
-  - scale: &scale_2 2
+  - scale: &scale_2 1.5
 default_params: &params
   sampler_name: DPM++ 2S a Karras
   steps: 8
@@ -70,28 +70,36 @@ loopbacks:
             - true  # fast_decoder
             - true  # fast_encoder
             - false  # color_fix
-  # - api_endpoint: "/sdapi/v1/img2img"
-  #   params:
-  #     <<: *params
-  #     init_images: []
-  #     denoising_strength: 0.35
-  #     script_name: "Ultimate SD upscale"
-  #     script_args:
-  #       - 0  # _
-  #       - 512  # tile_width
-  #       - 0  # tile_height
-  #       - 24  # mask_blur
-  #       - 64  # padding
-  #       - 64  # seams_fix_width
-  #       - 0.35  # seams_fix_denoise
-  #       - 64  # seams_fix_padding
-  #       - 3  # upscaler_index
-  #       - True  # save_upscaled_image
-  #       - 1  # redraw_mode "Linear", "Chess", "None"
-  #       - False  # save_seams_fix_image
-  #       - 16  # seams_fix_mask_blur
-  #       - 0  # seams_fix_type "None", "Band pass", "Half tile offset pass", "Half tile offset pass + intersections"
-  #       - 2  # target_size_type "From img2img2 settings", "Custom size", "Scale from image size"
-  #       - 0  # custom_width
-  #       - 0  # custom_height
-  #       - 2  *scale_2 # custom_scale
+  - api_endpoint: "/sdapi/v1/img2img"
+    params:
+      <<: *params
+      init_images: []
+      denoising_strength: 1
+      alwayson_scripts:
+        "ControlNet":
+          args:
+            - module: "tile_resample"
+              model: "control_v11f1e_sd15_tile [a371b31b]"
+              processor_res: 64
+              threshold_a: 1
+              threshold_b: 64
+      script_name: "Ultimate SD upscale"
+      script_args:
+        - 0  # _
+        - 512  # tile_width
+        - 0  # tile_height
+        - 24  # mask_blur
+        - 64  # padding
+        - 64  # seams_fix_width
+        - 0.35  # seams_fix_denoise
+        - 64  # seams_fix_padding
+        - 3  # upscaler_index
+        - True  # save_upscaled_image
+        - 1  # redraw_mode "Linear", "Chess", "None"
+        - False  # save_seams_fix_image
+        - 16  # seams_fix_mask_blur
+        - 0  # seams_fix_type "None", "Band pass", "Half tile offset pass", "Half tile offset pass + intersections"
+        - 2  # target_size_type "From img2img2 settings", "Custom size", "Scale from image size"
+        - 0  # custom_width
+        - 0  # custom_height
+        - *scale_2 # custom_scale
