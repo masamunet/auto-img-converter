@@ -60,6 +60,7 @@ loopbacks:
               processor_res: 64
               threshold_a: 1
               threshold_b: 64
+              resize_mode: 1  # Just Resize, Scale to Fit (Inner Fit), Envelope (Outer Fit)
         "Tiled VAE":
           args:
             - 0  # p
@@ -84,6 +85,7 @@ loopbacks:
               processor_res: 64
               threshold_a: 1
               threshold_b: 64
+              resize_mode: 1  # Just Resize, Scale to Fit (Inner Fit), Envelope (Outer Fit)
       script_name: "Ultimate SD upscale"
       script_args:
         - 0  # _

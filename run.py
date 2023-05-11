@@ -79,7 +79,8 @@ def loopback(setting_params):
     r_seed = None
     prompt = setting_params["f_prompt"]
     negative_prompt = setting_params["f_negative_prompt"]
-    for i in range(len(setting_params["loopbacks"])):
+    max_count = len(setting_params["loopbacks"])
+    for i in range(max_count):
         loopback_params = setting_params["loopbacks"][i]
         if "is_disabled" in loopback_params:
           if loopback_params["is_disabled"]:
@@ -88,10 +89,10 @@ def loopback(setting_params):
         params = loopback_params["params"]
         params["prompt"] = prompt
         params["negative_prompt"] = negative_prompt
-        print("loopback: {}".format(i))
+        print("loopback: {}/{}".format(i, max_count))
         print("endpoint: {}".format(endpoint))
         params["prompt"] = setting_params["f_prompt"]
-        print("params: {}".format(params))
+        # print("params: {}".format(params))
         params["negative_prompt"] = setting_params["f_negative_prompt"]
         if r_seed is not None:
             if params["seed"] < 0:
@@ -119,7 +120,7 @@ def loopback(setting_params):
 def run(args):
     # countの回数+1だけstart()を実行する
     for i in range(args.count):
-        print("count: {}".format(i))
+        print("count: {}/{}".format(i, args.count))
         setting_params = load_yaml(args.yaml_file)
         loopback(setting_params)
     print("Done!")
