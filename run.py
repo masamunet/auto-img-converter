@@ -6,6 +6,9 @@ import time
 import yaml
 import argparse
 import notify
+# 実行時間計測用のクラス
+from Timer import Timer
+import time
 
 
 uri = "http://localhost:7860"
@@ -81,50 +84,59 @@ def loopback(setting_params):
     negative_prompt = setting_params["f_negative_prompt"]
     max_count = len(setting_params["loopbacks"])
     for i in range(max_count):
-        loopback_params = setting_params["loopbacks"][i]
-        if "is_disabled" in loopback_params:
-            if loopback_params["is_disabled"]:
-                continue
-        endpoint = loopback_params["api_endpoint"]
-        params = loopback_params["params"]
-        params["prompt"] = prompt
-        params["negative_prompt"] = negative_prompt
-        print("loopback: {}/{}".format(i + 1, max_count))
-        print("endpoint: {}".format(endpoint))
-        params["prompt"] = setting_params["f_prompt"]
-        # print("params: {}".format(params))
-        params["negative_prompt"] = setting_params["f_negative_prompt"]
-        if r_seed is not None:
-            if params["seed"] < 0:
-                params["seed"] = r_seed
-        if "init_images" in loopback_params["params"]:
-            params["init_images"] = [image_base64]
-        # "alwayson_scripts"がある場合
-        if "alwayson_scripts" in loopback_params["params"]:
-            # "ControlNet"がある場合
-            if "ControlNet" in loopback_params["params"]["alwayson_scripts"]:
-                # "input_image"がある場合
-                if "input_image" in loopback_params["params"]["alwayson_scripts"]["ControlNet"]["args"][0]:
-                    # "input_image"を置き換える
-                    loopback_params["params"]["alwayson_scripts"]["ControlNet"]["args"][0]["input_image"] = image_base64
-                    # 新しい辞書をparams["alwayson_scripts"]["ControlNet"]に代入する
-                    params["alwayson_scripts"]["ControlNet"] = loopback_params["params"]["alwayson_scripts"]["ControlNet"]
+        with Timer() as timer:
+            loopback_params = setting_params["loopbacks"][i]
+            if "is_disabled" in loopback_params:
+                if loopback_params["is_disabled"]:
+                    continue
+            endpoint = loopback_params["api_endpoint"]
+            params = loopback_params["params"]
+            params["prompt"] = prompt
+            params["negative_prompt"] = negative_prompt
+            print("\tloopback: {}/{}".format(i + 1, max_count))
+            print("\tendpoint: {}".format(endpoint))
+            params["prompt"] = setting_params["f_prompt"]
+            # print("params: {}".format(params))
+            params["negative_prompt"] = setting_params["f_negative_prompt"]
+            if r_seed is not None:
+                if params["seed"] < 0:
+                    params["seed"] = r_seed
+            if "init_images" in loopback_params["params"]:
+                params["init_images"] = [image_base64]
+            # "alwayson_scripts"がある場合
+            if "alwayson_scripts" in loopback_params["params"]:
+                # "ControlNet"がある場合
+                if "ControlNet" in loopback_params["params"]["alwayson_scripts"]:
+                    # "input_image"がある場合
+                    if "input_image" in loopback_params["params"]["alwayson_scripts"]["ControlNet"]["args"][0]:
+                        # "input_image"を置き換える
+                        loopback_params["params"]["alwayson_scripts"]["ControlNet"]["args"][0]["input_image"] = image_base64
+                        # 新しい辞書をparams["alwayson_scripts"]["ControlNet"]に代入する
+                        params["alwayson_scripts"]["ControlNet"] = loopback_params["params"]["alwayson_scripts"]["ControlNet"]
 
-        infotexts, image_base64, r_seed = any2img(
-            uri, endpoint, params)
-        info_lines = infotexts[0].split("\n")
-        prompt = info_lines[0]
-        negative_prompt = info_lines[1].replace("Negative prompt: ", "")
+            infotexts, image_base64, r_seed = any2img(
+                uri, endpoint, params)
+            info_lines = infotexts[0].split("\n")
+            prompt = info_lines[0]
+            negative_prompt = info_lines[1].replace("Negative prompt: ", "")
+        execution_time = timer.get_execution_time()
+        print(f"\tLOOPBACK実行時間: {execution_time}")
 
 
 def run(args):
     # countの回数+1だけstart()を実行する
     for i in range(args.count):
-        print("count: {}/{}".format(i + 1, args.count))
-        setting_params = load_yaml(args.yaml_file)
-        loopback(setting_params)
+        with Timer() as timer:
+            print("count: {}/{}".format(i + 1, args.count))
+            setting_params = load_yaml(args.yaml_file)
+            loopback(setting_params)
+        execution_time = timer.get_execution_time()
+        print(f"COUNT実行時間: {execution_time}")
     print("Done!")
-    notify.notify("処理が完了しました!")
+    try:
+        notify.notify("処理が完了しました!")
+    except:
+        pass
     return
 
 
