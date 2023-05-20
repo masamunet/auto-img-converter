@@ -9,6 +9,7 @@ import notify
 # 実行時間計測用のクラス
 from Timer import Timer
 import time
+from TimeEstimator import TimeEstimator
 
 
 uri = "http://localhost:7860"
@@ -123,14 +124,23 @@ def loopback(setting_params):
 
 
 def run(args):
+    estimator = TimeEstimator(args.count)  # インスタンス生成、最大回数を引数に渡す
+    estimator.start_process()  # 処理開始を記録
+
     # countの回数+1だけstart()を実行する
     for i in range(args.count):
+        start_time = time.time()  # イテレーション開始時刻を記録
         with Timer() as timer:
             print("count: {}/{}".format(i + 1, args.count))
             setting_params = load_yaml(args.yaml_file)
             loopback(setting_params)
         execution_time = timer.get_execution_time()
         print(f"COUNT実行時間: {execution_time}")
+        end_time = time.time()  # イテレーション終了時刻を記録
+        iteration_time = end_time - start_time  # イテレーションにかかった時間を計算
+        remaining_time, end_time = estimator.log_iteration(
+            iteration_time)  # 残りの処理時間と終了予定時刻を取得
+        print(f'残り時間: {remaining_time}, 終了時刻: {end_time}')  # 結果を表示
     print("Done!")
     try:
         notify.notify("処理が完了しました!")
