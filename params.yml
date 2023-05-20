@@ -72,7 +72,7 @@ loopbacks:
             - true  # fast_encoder
             - false  # color_fix
   - api_endpoint: "/sdapi/v1/img2img"
-    is_disabled: true # このループバックは無効にする
+    is_enabled: false # この値が存在しつつ、falseの場合はループバックは無効にする。つまり存在しないか、存在していてもtrueの場合はループバックされる
     params:
       <<: *params
       init_images: []
