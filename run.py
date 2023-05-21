@@ -9,7 +9,7 @@ import notify
 # 実行時間計測用のクラス
 from Timer import Timer
 import time
-from TimeEstimator import TimeEstimator
+from time_estimator import TimeEstimator
 
 
 uri = "http://localhost:7860"
