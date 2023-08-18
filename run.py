@@ -117,48 +117,48 @@ def any2img(uri, endpoint, params):
     url = uri + endpoint
     image_base64, res_info = get_any2img(url, payload)
     # res_infoがNoneTypeかどうかprint
-    print("res_info is NoneType: {}".format(res_info is None)
+    print("res_info is NoneType: {}".format(res_info is None))
     print(res_info)
-    infotexts=res_info["infotexts"]
-    r_seed=res_info["seed"]
+    infotexts = res_info["infotexts"]
+    r_seed = res_info["seed"]
     return infotexts, image_base64, r_seed
 
 
 def loopback(setting_params):
-    infotexts=None
-    image_base64=None
-    r_seed=None
+    infotexts = None
+    image_base64 = None
+    r_seed = None
     # プロンプトとネガティブプロンプトが配列だった場合はランダムな要素を取得する
-    prompt=get_random_element(setting_params["f_prompt"])
-    negative_prompt=get_random_element(
+    prompt = get_random_element(setting_params["f_prompt"])
+    negative_prompt = get_random_element(
         setting_params["f_negative_prompt"])
     # もしサイズをランダムな縦横比にする設定だった場合は、ランダムな縦横比を取得する
     if setting_params.get('is_random_swap_width_height'):
-        size=setting_params.get('size')
+        size = setting_params.get('size')
         if size is not None:
-            new_size=swap_width_height(size)
-            setting_params['size']=new_size
+            new_size = swap_width_height(size)
+            setting_params['size'] = new_size
     # ループバックの回数だけループする
-    max_count=len(setting_params["loopbacks"])
+    max_count = len(setting_params["loopbacks"])
     for i in range(max_count):
         with Timer() as timer:
             # ループバックのパラメータを取得する
-            loopback_params=setting_params["loopbacks"][i]
+            loopback_params = setting_params["loopbacks"][i]
             # "is_enabled"がある場合
             if "is_enabled" in loopback_params and not loopback_params["is_enabled"]:
                 # ループバックをスキップする
                 continue
-            endpoint=loopback_params["api_endpoint"]
-            params=loopback_params["params"]
-            params["prompt"]=prompt
-            params["negative_prompt"]=negative_prompt
+            endpoint = loopback_params["api_endpoint"]
+            params = loopback_params["params"]
+            params["prompt"] = prompt
+            params["negative_prompt"] = negative_prompt
             print("\tloopback: {}/{}".format(i + 1, max_count))
             print("\tendpoint: {}".format(endpoint))
             if r_seed is not None:
                 if params["seed"] < 0:
-                    params["seed"]=r_seed
+                    params["seed"] = r_seed
             if "init_images" in loopback_params["params"]:
-                params["init_images"]=[image_base64]
+                params["init_images"] = [image_base64]
             # "alwayson_scripts"がある場合
             if "alwayson_scripts" in loopback_params["params"]:
                 # "ControlNet"がある場合
@@ -166,35 +166,35 @@ def loopback(setting_params):
                     # "input_image"がある場合
                     if "input_image" in loopback_params["params"]["alwayson_scripts"]["ControlNet"]["args"][0]:
                         # "input_image"を置き換える
-                        loopback_params["params"]["alwayson_scripts"]["ControlNet"]["args"][0]["input_image"]=image_base64
+                        loopback_params["params"]["alwayson_scripts"]["ControlNet"]["args"][0]["input_image"] = image_base64
                         # 新しい辞書をparams["alwayson_scripts"]["ControlNet"]に代入する
-                        params["alwayson_scripts"]["ControlNet"]=loopback_params["params"]["alwayson_scripts"]["ControlNet"]
+                        params["alwayson_scripts"]["ControlNet"] = loopback_params["params"]["alwayson_scripts"]["ControlNet"]
 
-            infotexts, image_base64, r_seed=any2img(
+            infotexts, image_base64, r_seed = any2img(
                 uri, endpoint, params)
-            info_lines=infotexts[0].split("\n")
-            prompt=info_lines[0]
-            negative_prompt=info_lines[1].replace("Negative prompt: ", "")
-        execution_time=timer.get_execution_time()
+            info_lines = infotexts[0].split("\n")
+            prompt = info_lines[0]
+            negative_prompt = info_lines[1].replace("Negative prompt: ", "")
+        execution_time = timer.get_execution_time()
         print(f"\tLOOPBACK実行時間: {execution_time}")
 
 
 def run(args):
-    estimator=TimeEstimator(args.count)  # インスタンス生成、最大回数を引数に渡す
+    estimator = TimeEstimator(args.count)  # インスタンス生成、最大回数を引数に渡す
     estimator.start_process()  # 処理開始を記録
 
     # countの回数+1だけstart()を実行する
     for i in range(args.count):
-        start_time=time.time()  # イテレーション開始時刻を記録
+        start_time = time.time()  # イテレーション開始時刻を記録
         with Timer() as timer:
             print("count: {}/{}".format(i + 1, args.count))
-            setting_params=load_yaml(args.yaml_file)
+            setting_params = load_yaml(args.yaml_file)
             loopback(setting_params)
-        execution_time=timer.get_execution_time()
+        execution_time = timer.get_execution_time()
         print(f"COUNT実行時間: {execution_time}")
-        end_time=time.time()  # イテレーション終了時刻を記録
-        iteration_time=end_time - start_time  # イテレーションにかかった時間を計算
-        remaining_time, end_time=estimator.log_iteration(
+        end_time = time.time()  # イテレーション終了時刻を記録
+        iteration_time = end_time - start_time  # イテレーションにかかった時間を計算
+        remaining_time, end_time = estimator.log_iteration(
             iteration_time)  # 残りの処理時間と終了予定時刻を取得
         print(f'残り時間: {remaining_time}, 終了時刻: {end_time}')  # 結果を表示
     print("Done!")
@@ -208,11 +208,11 @@ def run(args):
 #  直接実行された場合、start(count, params)を実行
 if __name__ == "__main__":
     # 引数の設定
-    parser=argparse.ArgumentParser(
+    parser = argparse.ArgumentParser(
         description="Script to load parameters from YAML file.")
     parser.add_argument("-f", "--yaml_file", type=str,
                         default="params.yml", help="YAML file containing parameters")
     parser.add_argument("-c", "--count", type=int,
                         default=1, help="loopback count")
-    args=parser.parse_args()
+    args = parser.parse_args()
     run(args)
