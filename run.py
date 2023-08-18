@@ -116,7 +116,7 @@ def any2img(uri, endpoint, params):
     payload = params.copy()
     url = uri + endpoint
     image_base64, res_info = get_any2img(url, payload)
-    print(res_info)
+    print(res_info["infotexts"])
     infotexts = res_info["infotexts"]
     r_seed = res_info["seed"]
     return infotexts, image_base64, r_seed
