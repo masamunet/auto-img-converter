@@ -97,6 +97,7 @@ def get_any2img(url, payload):
     """
     webui api にアクセスし、結果を返す
     """
+    print(payload)
     response = access_api(url, payload)
     # レスポンスのステータスコードを確認する
     if response.status_code == 200:
@@ -116,9 +117,6 @@ def any2img(uri, endpoint, params):
     payload = params.copy()
     url = uri + endpoint
     image_base64, res_info = get_any2img(url, payload)
-    # res_infoがNoneTypeかどうかprint
-    print("res_info is NoneType: {}".format(res_info is None))
-    print(res_info)
     infotexts = res_info["infotexts"]
     r_seed = res_info["seed"]
     return infotexts, image_base64, r_seed
