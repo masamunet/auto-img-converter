@@ -109,7 +109,6 @@ def get_any2img(url, payload):
     else:
         # レスポンスがエラーの場合、エラーメッセージを出力する
         print("Error: {}".format(response.text))
-        print(payload)
         return None, None
 
 
