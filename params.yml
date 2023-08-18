@@ -1,7 +1,13 @@
 f_prompt: # 最初に開始するプロンプト。ダイナミックプロンプトが有効なので、一回目はこのプロンプトを使用する。２回目以降からはパースされたプロンプトを使用する
-  - "dog riding a skateboard"
-  - "bear in space suit"
-f_negative_prompt: "cat"  # 最初に開始するネガティブプロンプト
+  - |
+    dog riding a skateboard.
+    test
+  - |
+    bear in space suit
+    test
+f_negative_prompt: | # 最初に開始するネガティブプロンプト
+  cat
+  test
 is_random_swap_width_height: false # 縦横サイズをランダムに入れ替えたい場合はtrueにする
 size:
   - width: &w_1 512
