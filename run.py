@@ -116,7 +116,6 @@ def any2img(uri, endpoint, params):
     payload = params.copy()
     url = uri + endpoint
     image_base64, res_info = get_any2img(url, payload)
-    print(res_info["infotexts"])
     infotexts = res_info["infotexts"]
     r_seed = res_info["seed"]
     return infotexts, image_base64, r_seed
@@ -152,6 +151,7 @@ def loopback(setting_params):
             params["negative_prompt"] = negative_prompt
             print("\tloopback: {}/{}".format(i + 1, max_count))
             print("\tendpoint: {}".format(endpoint))
+            print(r_seed)
             if r_seed is not None:
                 if params["seed"] < 0:
                     params["seed"] = r_seed
