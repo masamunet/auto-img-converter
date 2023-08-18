@@ -1,5 +1,8 @@
-f_prompt: "dog riding a skateboard" # 最初に開始するプロンプト。ダイナミックプロンプトが有効なので、一回目はこのプロンプトを使用する。２回目以降からはパースされたプロンプトを使用する
+f_prompt: # 最初に開始するプロンプト。ダイナミックプロンプトが有効なので、一回目はこのプロンプトを使用する。２回目以降からはパースされたプロンプトを使用する
+  - "dog riding a skateboard"
+  - "bear in space suit"
 f_negative_prompt: "cat"  # 最初に開始するネガティブプロンプト
+is_random_swap_width_height: false # 縦横サイズをランダムに入れ替えたい場合はtrueにする
 size:
   - width: &w_1 512
     height: &h_1 512
@@ -20,7 +23,7 @@ loopbacks:
     params:
       <<: *params
       alwayson_scripts:
-        "Dynamic Prompts v2.11.2":  &dp
+        "Dynamic Prompts v2.16.1":  &dp
           args:
             - True  # is_enabled
             - False  # is_combinatorial
@@ -51,7 +54,7 @@ loopbacks:
       hr_upscaler: "Latent" # "R-ESRGAN 4x+"
       denoising_strength: 0.7
       alwayson_scripts:
-        "Dynamic Prompts v2.11.2":  *dp
+        "Dynamic Prompts v2.16.1":  *dp
         "ControlNet":
           args:
             - input_image: null

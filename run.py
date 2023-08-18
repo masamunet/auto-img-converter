@@ -35,6 +35,27 @@ def get_random_element(variable):
         return variable
 
 
+def swap_width_height(data_list):
+    """
+    辞書のリストから、'width'と'height'の値を入れ替えます。
+
+    Parameters:
+        data_list (list): 入れ替えを行いたい辞書のリスト。
+
+    Returns:
+        list: 'width'と'height'の値を入れ替えた辞書のリスト。
+    """
+    swapped_data = []
+    for item in data_list:
+        if 'width' in item and 'height' in item:
+            width = item['width']
+            height = item['height']
+            item['width'] = height
+            item['height'] = width
+        swapped_data.append(item)
+    return swapped_data
+
+
 def load_yaml(yaml_file):
     """YAMLファイルを読み込み、辞書型に変換する関数"""
     with open(yaml_file, encoding="utf-8") as f:
@@ -73,6 +94,9 @@ def access_api(url, payload):
 
 # access_apiのラッパー。webui api にアクセスし、結果を返す
 def get_any2img(url, payload):
+    """
+    webui api にアクセスし、結果を返す
+    """
     response = access_api(url, payload)
     # レスポンスのステータスコードを確認する
     if response.status_code == 200:
@@ -101,15 +125,23 @@ def loopback(setting_params):
     infotexts = None
     image_base64 = None
     r_seed = None
-    # プロンプトとネガティブプロンプトが配列だった場合はランダムな要素を取得する
-    prompt = get_random_element(setting_params["f_prompt"])
-    negative_prompt = get_random_element(setting_params["f_negative_prompt"])
     # ループバックの回数だけループする
     max_count = len(setting_params["loopbacks"])
     for i in range(max_count):
         with Timer() as timer:
+            # プロンプトとネガティブプロンプトが配列だった場合はランダムな要素を取得する
+            prompt = get_random_element(setting_params["f_prompt"])
+            negative_prompt = get_random_element(
+                setting_params["f_negative_prompt"])
+            # もしサイズをランダムな縦横比にする設定だった場合は、ランダムな縦横比を取得する
+            if setting_params['is_random_swap_width_height']:
+                setting_params['size'] = swap_width_height(
+                    setting_params['size'])
+            # ループバックのパラメータを取得する
             loopback_params = setting_params["loopbacks"][i]
+            # "is_enabled"がある場合
             if "is_enabled" in loopback_params and not loopback_params["is_enabled"]:
+                # ループバックをスキップする
                 continue
             endpoint = loopback_params["api_endpoint"]
             params = loopback_params["params"]
@@ -117,9 +149,6 @@ def loopback(setting_params):
             params["negative_prompt"] = negative_prompt
             print("\tloopback: {}/{}".format(i + 1, max_count))
             print("\tendpoint: {}".format(endpoint))
-            params["prompt"] = setting_params["f_prompt"]
-            # print("params: {}".format(params))
-            params["negative_prompt"] = setting_params["f_negative_prompt"]
             if r_seed is not None:
                 if params["seed"] < 0:
                     params["seed"] = r_seed
