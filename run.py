@@ -6,6 +6,7 @@ import time
 import yaml
 import argparse
 import notify
+import random
 # 実行時間計測用のクラス
 from Timer import Timer
 import time
@@ -13,6 +14,25 @@ from time_estimator import TimeEstimator
 
 
 uri = "http://localhost:7860"
+
+
+def get_random_element(variable):
+    """
+    配列の場合はランダムな要素を、それ以外の場合はそのまま返します。
+
+    Parameters:
+        variable (any): 処理したい変数。
+
+    Returns:
+        any: 配列の場合はランダムな要素、それ以外の場合はそのままの値。
+    """
+    if isinstance(variable, list):
+        if len(variable) > 0:
+            return random.choice(variable)
+        else:
+            return None
+    else:
+        return variable
 
 
 def load_yaml(yaml_file):
@@ -81,8 +101,10 @@ def loopback(setting_params):
     infotexts = None
     image_base64 = None
     r_seed = None
-    prompt = setting_params["f_prompt"]
-    negative_prompt = setting_params["f_negative_prompt"]
+    # プロンプトとネガティブプロンプトが配列だった場合はランダムな要素を取得する
+    prompt = get_random_element(setting_params["f_prompt"])
+    negative_prompt = get_random_element(setting_params["f_negative_prompt"])
+    # ループバックの回数だけループする
     max_count = len(setting_params["loopbacks"])
     for i in range(max_count):
         with Timer() as timer:
