@@ -97,7 +97,6 @@ def get_any2img(url, payload):
     """
     webui api にアクセスし、結果を返す
     """
-    print(payload)
     response = access_api(url, payload)
     # レスポンスのステータスコードを確認する
     if response.status_code == 200:
@@ -117,9 +116,10 @@ def any2img(uri, endpoint, params):
     payload = params.copy()
     url = uri + endpoint
     image_base64, res_info = get_any2img(url, payload)
-    infotexts = res_info["infotexts"]
+    prompt = res_info["prompt"]
+    negative_prompt = res_info["negative_prompt"]
     r_seed = res_info["seed"]
-    return infotexts, image_base64, r_seed
+    return image_base64, r_seed, prompt, negative_prompt
 
 
 def loopback(setting_params):
@@ -168,11 +168,10 @@ def loopback(setting_params):
                         # 新しい辞書をparams["alwayson_scripts"]["ControlNet"]に代入する
                         params["alwayson_scripts"]["ControlNet"] = loopback_params["params"]["alwayson_scripts"]["ControlNet"]
 
-            infotexts, image_base64, r_seed = any2img(
+            image_base64, r_seed, res_prompt, res_negative_prompt = any2img(
                 uri, endpoint, params)
-            info_lines = infotexts[0].split("\n")
-            prompt = info_lines[0]
-            negative_prompt = info_lines[1].replace("Negative prompt: ", "")
+            prompt = res_prompt
+            negative_prompt = res_negative_prompt
         execution_time = timer.get_execution_time()
         print(f"\tLOOPBACK実行時間: {execution_time}")
 
