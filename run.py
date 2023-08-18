@@ -125,20 +125,20 @@ def loopback(setting_params):
     infotexts = None
     image_base64 = None
     r_seed = None
+    # プロンプトとネガティブプロンプトが配列だった場合はランダムな要素を取得する
+    prompt = get_random_element(setting_params["f_prompt"])
+    negative_prompt = get_random_element(
+        setting_params["f_negative_prompt"])
+    # もしサイズをランダムな縦横比にする設定だった場合は、ランダムな縦横比を取得する
+    if setting_params.get('is_random_swap_width_height'):
+        size = setting_params.get('size')
+        if size is not None:
+            new_size = swap_width_height(size)
+            setting_params['size'] = new_size
     # ループバックの回数だけループする
     max_count = len(setting_params["loopbacks"])
     for i in range(max_count):
         with Timer() as timer:
-            # プロンプトとネガティブプロンプトが配列だった場合はランダムな要素を取得する
-            prompt = get_random_element(setting_params["f_prompt"])
-            negative_prompt = get_random_element(
-                setting_params["f_negative_prompt"])
-            # もしサイズをランダムな縦横比にする設定だった場合は、ランダムな縦横比を取得する
-            if setting_params.get('is_random_swap_width_height'):
-                size = setting_params.get('size')
-                if size is not None:
-                    new_size = swap_width_height(size)
-                    setting_params['size'] = new_size
             # ループバックのパラメータを取得する
             loopback_params = setting_params["loopbacks"][i]
             # "is_enabled"がある場合
