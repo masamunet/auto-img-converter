@@ -134,9 +134,11 @@ def loopback(setting_params):
             negative_prompt = get_random_element(
                 setting_params["f_negative_prompt"])
             # もしサイズをランダムな縦横比にする設定だった場合は、ランダムな縦横比を取得する
-            if setting_params['is_random_swap_width_height']:
-                setting_params['size'] = swap_width_height(
-                    setting_params['size'])
+            if setting_params.get('is_random_swap_width_height'):
+                size = setting_params.get('size')
+                if size is not None:
+                    new_size = swap_width_height(size)
+                    setting_params['size'] = new_size
             # ループバックのパラメータを取得する
             loopback_params = setting_params["loopbacks"][i]
             # "is_enabled"がある場合
