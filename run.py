@@ -98,7 +98,6 @@ def get_any2img(url, payload):
     webui api にアクセスし、結果を返す
     """
     response = access_api(url, payload)
-    print(response.text)
     # レスポンスのステータスコードを確認する
     if response.status_code == 200:
         # レスポンスが正常な場合、レスポンスボディを出力する
@@ -110,6 +109,7 @@ def get_any2img(url, payload):
     else:
         # レスポンスがエラーの場合、エラーメッセージを出力する
         print("Error: {}".format(response.text))
+        print(payload)
         return None, None
 
 
