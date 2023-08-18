@@ -152,7 +152,8 @@ def loopback(setting_params):
             print("\tloopback: {}/{}".format(i + 1, max_count))
             print("\tendpoint: {}".format(endpoint))
             if r_seed is not None:
-                params["seed"] = r_seed
+                if params["seed"] < 0:
+                    params["seed"] = r_seed
             if "init_images" in loopback_params["params"]:
                 params["init_images"] = [image_base64]
             # "alwayson_scripts"がある場合
