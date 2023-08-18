@@ -151,8 +151,8 @@ def loopback(setting_params):
             params["negative_prompt"] = negative_prompt
             print("\tloopback: {}/{}".format(i + 1, max_count))
             print("\tendpoint: {}".format(endpoint))
-            print(r_seed)
             if r_seed is not None:
+                print(params["seed"])
                 if params["seed"] < 0:
                     params["seed"] = r_seed
             if "init_images" in loopback_params["params"]:
