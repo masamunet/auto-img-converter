@@ -17,7 +17,7 @@ size:
     scale: &scale_1 1.25
   - scale: &scale_2 1.5
 default_params: &params
-  sampler_name: DPM++ 2S a Karras
+  sampler_name: DPM++ 2M SDE Karras
   steps: 8
   width: *w_1
   height: *h_1
