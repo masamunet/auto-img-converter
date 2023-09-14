@@ -29,7 +29,7 @@ loopbacks:
     params:
       <<: *params
       alwayson_scripts:
-        "Dynamic Prompts v2.16.1":  &dp
+        "Dynamic Prompts v2.16.3":  &dp
           args:
             - True  # is_enabled
             - False  # is_combinatorial
@@ -60,7 +60,6 @@ loopbacks:
       hr_upscaler: "Latent" # "R-ESRGAN 4x+"
       denoising_strength: 0.7
       alwayson_scripts:
-        "Dynamic Prompts v2.16.1":  *dp
         "ControlNet":
           args:
             - input_image: null
@@ -81,7 +80,7 @@ loopbacks:
             - true  # fast_encoder
             - false  # color_fix
   - api_endpoint: "/sdapi/v1/img2img"
-    is_enabled: false # この値が存在しつつ、falseの場合はループバックは無効にする。つまり存在しないか、存在していてもtrueの場合はループバックされる
+    is_enabled: true # この値が存在しつつ、falseの場合はループバックは無効にする。つまり存在しないか、存在していてもtrueの場合はループバックされる
     params:
       <<: *params
       init_images: []
