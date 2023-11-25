@@ -69,16 +69,16 @@ loopbacks:
               threshold_a: 1
               threshold_b: 64
               resize_mode: 1  # Just Resize, Scale to Fit (Inner Fit), Envelope (Outer Fit)
-        "Tiled VAE":
-          args:
-            - 0  # p
-            - true  # enabled
-            - 512  # encoder_tile_size
-            - 64  # decoder_tile_size
-            - true  # vae_to_gpu
-            - true  # fast_decoder
-            - true  # fast_encoder
-            - false  # color_fix
+        # "Tiled VAE":
+        #   args:
+        #     - 0  # p
+        #     - true  # enabled
+        #     - 512  # encoder_tile_size
+        #     - 64  # decoder_tile_size
+        #     - true  # vae_to_gpu
+        #     - true  # fast_decoder
+        #     - true  # fast_encoder
+        #     - false  # color_fix
   - api_endpoint: "/sdapi/v1/img2img"
     is_enabled: true # この値が存在しつつ、falseの場合はループバックは無効にする。つまり存在しないか、存在していてもtrueの場合はループバックされる
     params:
