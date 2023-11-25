@@ -48,11 +48,12 @@ def swap_width_height(data_list):
     swapped_data = []
     for item in data_list:
         if 'width' in item and 'height' in item:
-            width = item['width']
-            height = item['height']
-            item['width'] = height
-            item['height'] = width
-        swapped_data.append(item)
+            swapped_item = item.copy()
+            swapped_item['width'] = item['height']
+            swapped_item['height'] = item['width']
+            swapped_data.append(swapped_item)
+        else:
+            swapped_data.append(item.copy())
     return swapped_data
 
 
@@ -132,9 +133,17 @@ def loopback(setting_params):
         setting_params["f_negative_prompt"])
     # もしサイズをランダムな縦横比にする設定だった場合は、ランダムな縦横比を取得する
     if setting_params.get('is_random_swap_width_height'):
+        print('random swap size mode.')
         size = setting_params.get('size')
         if size is not None:
-            new_size = swap_width_height(size)
+            # この部分で関数を実行するかどうかを決定します
+            if random.random() < 0.5:
+                print("swap size.")
+                new_size = swap_width_height(size)
+            else:
+                print('nomal size.')
+                new_size = size  # 関数を実行しない場合は、元のサイズをそのまま使用
+            print("size:{}".format(new_size))
             setting_params['size'] = new_size
     # ループバックの回数だけループする
     max_count = len(setting_params["loopbacks"])
@@ -150,6 +159,12 @@ def loopback(setting_params):
             params = loopback_params["params"]
             params["prompt"] = prompt
             params["negative_prompt"] = negative_prompt
+            if 'width' in params and 'width' in setting_params['size'][i]:
+                params['width'] = setting_params['size'][i]['width']
+                print("\twidth:{}".format(params['width']))
+            if 'height' in params and 'height' in setting_params['size'][i]:
+                params['height'] = setting_params['size'][i]['height']
+                print('\theight:{}'.format(params['height']))
             print("\tloopback: {}/{}".format(i + 1, max_count))
             print("\tendpoint: {}".format(endpoint))
             if r_seed is not None:
