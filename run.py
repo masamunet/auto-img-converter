@@ -184,8 +184,10 @@ def run(args):
     for i in range(args.count):
         start_time = time.time()  # イテレーション開始時刻を記録
         with Timer() as timer:
+            yaml_file = args.yaml_file
+            print(yaml_file)
             print("count: {}/{}".format(i + 1, args.count))
-            setting_params = load_yaml(args.yaml_file)
+            setting_params = load_yaml(yaml_file)
             loopback(setting_params)
         execution_time = timer.get_execution_time()
         print(f"COUNT実行時間: {execution_time}")
