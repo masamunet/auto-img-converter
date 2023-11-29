@@ -81,7 +81,7 @@ def get_full_path(relative_path):
     return os.path.abspath(relative_path)
 
 
-def access_api(url, payload):
+def access_api(url, payload, auth=None)):
     # リクエストヘッダーにContent-Typeを指定する
     headers = {
         "Content-Type": "application/json",
@@ -89,16 +89,16 @@ def access_api(url, payload):
     }
 
     # POSTリクエストを送信する
-    response = requests.post(url, data=json.dumps(payload), headers=headers)
+    response = requests.post(url, data=json.dumps(payload), headers=headers, auth=auth)
     return response
 
 
 # access_apiのラッパー。webui api にアクセスし、結果を返す
-def get_any2img(url, payload):
+def get_any2img(url, payload, auth=None):
     """
     webui api にアクセスし、結果を返す
     """
-    response = access_api(url, payload)
+    response = access_api(url, payload, auth=auth)
     # レスポンスのステータスコードを確認する
     if response.status_code == 200:
         # レスポンスが正常な場合、レスポンスボディを出力する
@@ -113,10 +113,10 @@ def get_any2img(url, payload):
         return None, None
 
 
-def any2img(uri, endpoint, params):
+def any2img(uri, endpoint, params, auth=None):
     payload = params.copy()
     url = uri + endpoint
-    image_base64, res_info = get_any2img(url, payload)
+    image_base64, res_info = get_any2img(url, payload, auth=auth)
     prompt = res_info["prompt"]
     negative_prompt = res_info["negative_prompt"]
     r_seed = res_info["seed"]
@@ -127,6 +127,11 @@ def loopback(setting_params):
     infotexts = None
     image_base64 = None
     r_seed = None
+    
+    # setting_paramsからauth情報を取得
+    auth_str = setting_params.get('auth')
+    auth = tuple(auth_str.split(':')) if auth_str else None
+
     # プロンプトとネガティブプロンプトが配列だった場合はランダムな要素を取得する
     prompt = get_random_element(setting_params["f_prompt"])
     negative_prompt = get_random_element(
@@ -184,7 +189,7 @@ def loopback(setting_params):
                         params["alwayson_scripts"]["ControlNet"] = loopback_params["params"]["alwayson_scripts"]["ControlNet"]
 
             image_base64, r_seed, res_prompt, res_negative_prompt = any2img(
-                uri, endpoint, params)
+                uri, endpoint, params, auth=auth)
             prompt = res_prompt
             negative_prompt = res_negative_prompt
         execution_time = timer.get_execution_time()

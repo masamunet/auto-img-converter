@@ -8,6 +8,7 @@ f_prompt: # 最初に開始するプロンプト。ダイナミックプロン�
 f_negative_prompt: | # 最初に開始するネガティブプロンプト
   cat
   test
+auth: 'user:password' # ログインする場合は、ユーザー名とパスワードを指定する
 is_random_swap_width_height: false # 縦横サイズをランダムに入れ替えたい場合はtrueにする
 size:
   - width: &w_1 512
