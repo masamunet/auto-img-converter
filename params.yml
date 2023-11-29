@@ -29,7 +29,7 @@ loopbacks:
     params:
       <<: *params
       alwayson_scripts:
-        "Dynamic Prompts v2.16.3":  &dp
+        "Dynamic Prompts v2.17.1":  &dp
           args:
             - True  # is_enabled
             - False  # is_combinatorial
